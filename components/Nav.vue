@@ -10,7 +10,7 @@
 
 <style scoped>
 nav {
-  background-color: black;
+  background-color: #150f5c;
   font-size: 1.5rem;
   padding: 1rem;
 }
