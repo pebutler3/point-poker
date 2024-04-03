@@ -3,5 +3,9 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   devServer: {
     port: '8888'
-  }
+  },
+  modules: ['@pinia/nuxt'],
+  pinia: {
+    storesDirs: ['./stores/**'],
+  },
 })

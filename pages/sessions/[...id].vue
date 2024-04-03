@@ -1,35 +1,29 @@
 <script setup>
 import { createClient } from '@supabase/supabase-js'
+import { useSession } from '../../stores/session'
+
+definePageMeta({
+  middleware: ['session-stories']
+});
+
+const store = useSession();
+
 const supabase = createClient('https://moerqnfdfdkgbmqvurin.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vZXJxbmZkZmRrZ2JtcXZ1cmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Nzk1OTk5MjIsImV4cCI6MTk5NTE3NTkyMn0.MfVmwTXQHW5zeNkAXgiIfgmqmNx2LgQjPh0ANstCSpM')
 clearNuxtState('session');
 const router = useRouter();
 
-const { data } = await supabase.from('sessions').select().eq('id', useRouter().currentRoute.value.params.id[0])
-const session = useSession({ ...data })
+const { data } = await supabase.from('sessions')
+  .select()
+  .eq('id', useRouter()
+  .currentRoute.value.params.id[0])
 
-const sessionStories = ref([]);
-const sessionId = router.currentRoute?.value?.params?.id[0];
-
-const getStories = async () => {
-  let { data: stories, error } = await supabase
-    .from('stories')
-    .select("*")
-    .eq('session_id', sessionId)
-
-  sessionStories.value.push(...stories);
-}
-
-getStories();
-
-const pointOptions = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100];
-
-console.log(process)
+store.setActiveSession(...data)
 </script>
 
 <template>
-  <h1>{{ session?.session_name }}</h1>
+  <h1>{{ store.activeSession?.session_name }}</h1>
   <ul v-if="sessionStories">
-    <li v-for="story in sessionStories">
+    <li v-for="story in store.stories">
       <NuxtLink :to="`/sessions/stories/${story.id}`" prefetch>{{ story.title }}</NuxtLink>
     </li>
   </ul>

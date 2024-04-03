@@ -6,13 +6,10 @@ const router = useRouter();
 
 async function getSessions() {
   const { data } = await supabase.from('sessions').select()
-  useSessions(data);
+  useSessionsx(data);
 }
 
 onMounted(async () => {
-  // const { error } = await supabase
-  //   .from('sessions')
-  //   .insert({ session_name: 'xxx' })
   getSessions();
 })
 
@@ -32,7 +29,6 @@ const removeSession = async (sessionId) => {
     .delete()
     .eq('id', sessionId)
 }
-
 </script>
 
 <template>
