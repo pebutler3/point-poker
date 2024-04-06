@@ -1,38 +1,58 @@
 <script setup>
-import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://moerqnfdfdkgbmqvurin.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vZXJxbmZkZmRrZ2JtcXZ1cmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Nzk1OTk5MjIsImV4cCI6MTk5NTE3NTkyMn0.MfVmwTXQHW5zeNkAXgiIfgmqmNx2LgQjPh0ANstCSpM')
-clearNuxtState('session');
+import { onMounted } from 'vue';
+const supabase = useSupabaseClient();
+const store = useSession();
 const router = useRouter();
-const storyUsers = ref([]);
-
 const storyId = router.currentRoute?.value?.params?.id[0];
+const storiesPoints = ref([]);
 
-const getStory = async () => {
-  let { data: stories, error } = await supabase
-    .from('stories')
-    .select()
-    .eq('id', storyId)
+const { data, refresh } = await useAsyncData('story_points', async () => {
+  const { data } = await client.from('story_points').select('points')
+  return data
+})
 
-  return stories;
+const story = await useGetStoryById(supabase, storyId);
+
+useGetStoryUsers(supabase, await story[0].session_id);
+
+const handleInserts = (payload) => {
+  console.log('PAYLOAD', payload)
 }
 
-const story = await getStory();
+onMounted(async () => {
+  supabase.channel('story-points-channel')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'story_points' }, handleInserts)
+    .subscribe()
 
-const getStoryUsers = async () => {
-  let { data: users, error } = await supabase
-    .from('users')
-    .select()
-    .eq('session_id', story[0].session_id)
-
-  storyUsers.value = users;
-}
-
-getStoryUsers();
+  storiesPoints.value = await useStoriesPoints(supabase, storyId)
+})
 </script>
 
 <template>
-  <h1>{{ story[0].title }}</h1>
-  <ul>
-    <li v-for="{ username } in storyUsers">{{ username }}</li>
-  </ul>
+  <div class="flex flex--column">
+    <!-- <NuxtLink :to="`/sessions/${store.activeSession.id}`">Back</NuxtLink> -->
+    <h1>{{ story[0].title }}</h1>
+    <div class="flex">
+      <button v-for="point in store.pointOptions">
+        {{ point }}
+      </button>
+    </div>
+    <ul>
+      <li v-for="{ id, username } in store.activeSession.users">
+        <span v-if="id === store.whoami">*</span>
+        {{ username }}
+      </li>
+    </ul>
+  </div>
 </template>
+
+<style scoped>
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+button {
+  margin: 0 0.25rem;
+}
+</style>

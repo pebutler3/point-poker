@@ -10,9 +10,11 @@
 
 <style scoped>
 nav {
-  background-color: #150f5c;
+  background-color: var(--dark-blue);
   font-size: 1.5rem;
   padding: 1rem;
+  position: fixed;
+  width: 100%;
 }
 
 ul {

@@ -1,25 +1,30 @@
 <script setup>
 const emit = defineEmits(['create-session'])
 const title = ref('');
+const errors = ref(null);
+
+const createSession = (c) => {
+  // validateForm();
+  emit('create-session', title.value)
+}
+
+const validateForm = () => {
+  // We'll need to sanitize inputs!
+  if (!title) {
+    errors.value = "Session Name required"
+    return;
+  }
+
+  errors.value = null;
+  return;
+};
 </script>
 
 <template>
-  <form @submit.prevent>
+  <form @submit.prevent="createSession">
     <label for="title">
       <input id="title" type="text" placeholder="Session Name" v-model="title" required />
     </label>
-    <button @click="emit('create-session', title)">Create Session</button>
+    <button type="submit">Create Session</button>
   </form>
 </template>
-
-<style scoped>
-form {
-  display: flex;
-}
-
-input {
-  font-size: 2rem;
-  padding: 0.15rem;
-  margin-right: 0.5rem;
-}
-</style>

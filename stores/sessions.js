@@ -1,6 +1,7 @@
-export const useSessionStories = defineStore('sessions', () => {
-  const sessionStories = ref([])
-  const setSessionStores = (sessions) => sessionStories.value = sessions;
+export const useSessions = defineStore('sessions', () => {
+  const allSessions = ref([]);
 
-  return { sessionStories, setSessionStores }
-})
+  const setSessions = (sessions) => allSessions.value = sessions;
+
+  return { allSessions, setSessions }
+});
