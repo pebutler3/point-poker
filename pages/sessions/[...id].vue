@@ -28,15 +28,15 @@ const joinSession = async () => {
   const { data, error } = await supabase
     .from('users')
     .insert({
-      username: sessionUsername.value,
-      session_id: store.activeSession.id
-    })
+        username: sessionUsername.value,
+        session_id: store.activeSession.id
+      })
     .select()
           
   const { id, session_id, username } = data[0];
 
   if (!error) {
-    store.setPokerPoints({ session_id, id, username });
+    store.setPokerPoints({ id, session_id, username });
     isInSession.value = true;
   }
 }
@@ -73,7 +73,7 @@ onBeforeMount(() => {
       </form>
     </Flyout>
     <h1>{{ store.activeSession?.session_name }}</h1>
-    <form v-if="!store.whoami">
+    <form v-if="!store.whoami" @submit.prevent>
       <label for="joinSession" />
       <input type="text" id="joinSession" placeholder="Username" v-model="sessionUsername" />
       <button @click="joinSession">Join</button>

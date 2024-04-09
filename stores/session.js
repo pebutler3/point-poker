@@ -13,13 +13,11 @@ export const useSession = defineStore('session', () => {
   }
 
   const setPokerPoints = (...props) => {
-    console.log('here')
+    console.log('setPokerPoints', props)
     const storedPokerPoints = useStorage('pokerPoints');
 
     if (storedPokerPoints && storedPokerPoints.value) {
       const pokerPoints = storedPokerPoints.value;
-      // whoami.value = JSON.parse(pokerPoints);
-      // setActiveSession({ id: JSON.parse(pokerPoints).session_id })
       setWhoami(JSON.parse(pokerPoints).id)
     } else {
       useStorage('pokerPoints', {
@@ -27,7 +25,6 @@ export const useSession = defineStore('session', () => {
         id: props.id,
         username: props.username
       })
-
       whoami.value = props.id
     }
   }
