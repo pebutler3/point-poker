@@ -3,8 +3,9 @@ import { useStorage } from "@vueuse/core";
 export const useSession = defineStore('session', () => {
   const stories = ref([]);
   const activeSession = ref({});
+  const pointOptions = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100];
+  const temporarySession = ref(null);
   const whoami = ref(null)
-  const pointOptions = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100];
 
   const setActiveSession = (session) => activeSession.value = session;
   const setSessionStories = (sessionStories) => stories.value = sessionStories;
@@ -12,22 +13,38 @@ export const useSession = defineStore('session', () => {
     whoami.value = user;
   }
 
-  const setPokerPoints = (...props) => {
-    console.log('setPokerPoints', props)
+  const setPokerPoints = (id, session_id, username) => {
+    // const { id, session_id, username, } = [ ...props ];
+
+    console.log('SET_POKER_POINTS', {
+      id,
+      session_id,
+      username
+    })
+
     const storedPokerPoints = useStorage('pokerPoints');
 
-    if (storedPokerPoints && storedPokerPoints.value) {
-      const pokerPoints = storedPokerPoints.value;
-      setWhoami(JSON.parse(pokerPoints).id)
-    } else {
+    if (storedPokerPoints.value === "{}" || !storedPokerPoints.value) {
       useStorage('pokerPoints', {
-        session_id: props.session_id,
-        id: props.id,
-        username: props.username
+        id,
+        session_id,
+        username
       })
-      whoami.value = props.id
+
+      whoami.value = id
+    } else {
+      setWhoami(JSON.parse(storedPokerPoints.value).id)
     }
   }
+
+  const joinSession = async () => {
+    const { id, session_id, username } = await createUser();
+    store.setPokerPoints(id, session_id, username);
+    await createSession();
+    router.push(`/sessions/${session_id}`);
+  }
+
+  const setTemporarySession = (session) => temporarySession.value = session;
 
   return {
     activeSession,
@@ -37,6 +54,8 @@ export const useSession = defineStore('session', () => {
     setSessionStories,
     setWhoami,
     stories,
+    temporarySession,
+    setTemporarySession,
     whoami
   }
 })

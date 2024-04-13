@@ -1,4 +1,7 @@
 <script setup>
+import { v4 as uuidv4 } from 'uuid';
+import generateRandomTitle from '~/utils/generateRandomTitle';
+
 const supabase = useSupabaseClient();
 const router = useRouter();
 const sessionStore = useSession();
@@ -6,7 +9,6 @@ const sessionsStore = useSessions();
 
 async function getSessions() {
   const { data } = await supabase.from('sessions').select()
-  // useSessionsx(data);
   sessionsStore.setSessions(data);
 }
 
@@ -14,15 +16,24 @@ onMounted(async () => {
   await getSessions();
 })
 
-const createSession = async (title) => {
-  const { error, data } = await supabase
-    .from('sessions')
-    .insert({ session_name: title })
-    .select()
+const createTemporarySession = () => {
+  sessionStore.setTemporarySession({
+    id: uuidv4(),
+    session_name: generateRandomTitle(),
+  })
+  router.push('/sessions/create');
+}
 
-  sessionStore.setActiveSession(data[0].id);
-  router.push(`/sessions/${data[0].id}`);
-};
+// const createSession = async (title) => {
+//   const { error, data } = await supabase
+//     .from('sessions')
+//     .insert({ session_name: generateRandomTitle() })
+//     .select()
+
+//   sessionStore.setActiveSession(data[0]);
+//   // router.push(`/sessions/${data[0].id}`);
+//   router.push('/sessions/create');
+// };
 
 const removeSession = async (sessionId) => {
   const { error } = await supabase
@@ -36,8 +47,9 @@ const removeSession = async (sessionId) => {
 
 <template>
   <div>
-    <CreateSession @create-session="createSession" />
+    <CreateSession @create-session="createTemporarySession" />
     <h1>Sessions</h1>
+    <!-- Session List for Admins -->
     <ul class="session-list">
       <li class="session-list__list-item" v-for="session in sessionsStore.allSessions" :key="session?.id">
         <NuxtLink class="session-list__list-item-link" :to="`sessions/${session?.id}`" prefetch>

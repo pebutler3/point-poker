@@ -6,30 +6,22 @@ const router = useRouter();
 const storyId = router.currentRoute?.value?.params?.id[0];
 const storiesPoints = ref([]);
 const userHasVoted = ref(false);
-const usersPoints = ref(null);
-
-const { data, refresh } = await useAsyncData('story_points', async () => {
-  const { data } = await client.from('story_points').select('points')
-  return data
-})
 
 const story = await useGetStoryById(supabase, storyId);
 
-useGetStoryUsers(supabase, await story[0].session_id);
+useGetSessionUsers(supabase, await story[0].session_id);
 
 const handleInserts = (payload) => {
   console.log(payload)
-  usersPoints.value = payload['new'].points;
-  // console.log(usersPoints)
 }
 
 const getUsersPoints = (id) => {
   // const user = storiesPoints?.find((user) => user.id === id)
   // console.log(user);
+  console.log('GET_USERS_POINTS', id)
 }
 
 const pointsSelected = async (points) => {
-  
   const { data, error } = await supabase
     .from('story_points')
     .update({ points })
@@ -54,7 +46,7 @@ onMounted(async () => {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'story_points' }, handleInserts)
     .subscribe()
 
-  storiesPoints.value = await useStoriesPoints(supabase, storyId)
+  store.setPokerPoints(...await useStoriesPoints(supabase, storyId))
 })
 </script>
 

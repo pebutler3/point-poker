@@ -22,9 +22,9 @@ const validateForm = () => {
 
 <template>
   <form @submit.prevent="createSession">
-    <label for="title">
+    <!-- <label for="title">
       <input id="title" type="text" placeholder="Session Name" v-model="title" required />
-    </label>
+    </label> -->
     <button type="submit">Create Session</button>
   </form>
 </template>

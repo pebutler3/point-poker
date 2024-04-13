@@ -1,20 +1,20 @@
 <script setup>
-import { useDateFormat } from '@vueuse/core'
 import { onBeforeMount } from 'vue';
 import { useSession } from '../../stores/session';
+
+const store = useSession();
+const supabase = useSupabaseClient();
+const sessionUsername = ref(null);
+const sessionObserver = ref(false);
 
 definePageMeta({
   middleware: ['session-stories']
 });
-
-const store = useSession();
-const supabase = useSupabaseClient();
-const router = useRouter();
-const sessionUsername = ref(null);
-const isInSession = ref(false);
-const sessionStorage = ref({});
-const storyTitle = ref(null);
-const shouldShowFlyout = ref(false);
+// const router = useRouter();
+// const sessionUsername = ref(null);
+// const isInSession = ref(false);
+// const sessionStorage = ref({});
+// const shouldShowFlyout = ref(false);
 
 const { data } = await supabase.from('sessions')
   .select()
@@ -23,70 +23,75 @@ const { data } = await supabase.from('sessions')
 
 store.setActiveSession(...data)
 
-const joinSession = async () => {
+useGetSessionUsers(supabase, await store.activeSession.session_id);
 
-  const { data, error } = await supabase
-    .from('users')
-    .insert({
-        username: sessionUsername.value,
-        session_id: store.activeSession.id
-      })
-    .select()
+// const joinSession = async () => {
+
+//   const { data, error } = await supabase
+//     .from('users')
+//     .insert({
+//         username: sessionUsername.value,
+//         session_id: store.activeSession.id
+//       })
+//     .select()
           
-  const { id, session_id, username } = data[0];
+//   const { id, session_id, username } = data[0];
 
-  if (!error) {
-    store.setPokerPoints({ id, session_id, username });
-    isInSession.value = true;
-  }
-}
+//   if (!error) {
+//     store.setPokerPoints({ id, session_id, username });
+//     isInSession.value = true;
+//   }
+// }
 
-const createStory = async () => {
-  const { error, data } = await supabase
-    .from('stories')
-    .insert({ title: storyTitle.value, session_id: store.activeSession.id })
-    .select()
+// const createStory = async () => {
+//   const { error, data } = await supabase
+//     .from('stories')
+//     .insert({ title: storyTitle.value, session_id: store.activeSession.id })
+//     .select()
 
-    router.push(`/sessions/stories/${data[0].id}`)
-}
-
-const parseDate = (date) => {
-  const formattedDate = useDateFormat(date, 'MM/DD/YYYY')
-  return formattedDate.value;
-}
+//     router.push(`/sessions/stories/${data[0].id}`)
+// }
 
 onBeforeMount(() => {
-  if (JSON.parse(localStorage.getItem('pokerPoints'))) {
-    isInSession.value = true;
-    store.setPokerPoints();
-  }
+  // if (JSON.parse(localStorage.getItem('pokerPoints'))) {
+  //   isInSession.value = true;
+  //   store.setPokerPoints();
+  // }
 })
 </script>
 
 <template>
   <ClientOnly>
-    <Flyout :showFlyout="shouldShowFlyout" title="Create New Story for Pointing" @close-flyout="shouldShowFlyout = false">
-      <form class="flex--column" @submit.prevent>
-        <label for="createStory" />
-        <input type="text" id="createStory" placeholder="Story Name" v-model="storyTitle" />
-        <button class="with-margin" @click="createStory">Create New Story</button>
-      </form>
-    </Flyout>
     <h1>{{ store.activeSession?.session_name }}</h1>
-    <form v-if="!store.whoami" @submit.prevent>
+    <!-- <form class="flex flex--column" v-if="!store.whoami" @submit.prevent>
       <label for="joinSession" />
       <input type="text" id="joinSession" placeholder="Username" v-model="sessionUsername" />
+      <label class="flex" for="observer">
+        <input type="checkbox" name="observer" id="observer">
+        Observer?
+      </label>
       <button @click="joinSession">Join</button>
-    </form>
-    <ul>
+    </form> -->
+    <!-- <ul>
       <li>
         <NuxtLink to="" @click="shouldShowFlyout = true">+</NuxtLink>
-      </li>
-      <li v-for="story in store.stories">
+      </li> -->
+      <!-- <li v-for="story in store.stories">
         <NuxtLink :to="`/sessions/stories/${story.id}`" prefetch>
           {{ story.title }}
         </NuxtLink>
         <small>{{  parseDate(story.created_at) }}</small>
+      </li> -->
+    <!-- </ul> -->
+    <JoinSession
+      v-model:sessionUsername="sessionUsername"
+      v-model:session-observer="sessionObserver"
+      @join-session="joinSession"
+      v-if="!store.whoami"
+    />
+    <ul>
+      <li v-for="{ id, username } in store.activeSession.users">
+        {{ username }}
       </li>
     </ul>
   </ClientOnly>

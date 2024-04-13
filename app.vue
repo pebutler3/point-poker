@@ -11,6 +11,12 @@
   --dark-blue: #0c0835;
   --border-blue: #00cfff;
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+  --mx-1: 0 1rem;
+  --mx-2: 0 2rem;
+
+  --my-1: 1rem 0;
+  --my-2: 2rem 0;
 }
 
 html,
@@ -28,8 +34,20 @@ main {
   padding: 0 1rem;
 }
 
-form {
-  display: flex;
+.mx-1 {
+  margin: 0 1rem !important;
+}
+
+.mx-2 {
+  margin: 0 2rem !important;
+}
+
+.my-1 {
+  margin: 1rem 0 !important;
+}
+
+.my-2 {
+  margin: 2rem 0 !important;
 }
 
 input {
