@@ -19,26 +19,6 @@ useGetSessionUsers(supabase, await store?.activeSession?.session_id);
 
 <template>
   <h1>{{ store?.activeSession?.session_name }}</h1>
-  <!-- <form class="flex flex--column" v-if="!store.whoami" @submit.prevent>
-    <label for="joinSession" />
-    <input type="text" id="joinSession" placeholder="Username" v-model="sessionUsername" />
-    <label class="flex" for="observer">
-      <input type="checkbox" name="observer" id="observer">
-      Observer?
-    </label>
-    <button @click="joinSession">Join</button>
-  </form> -->
-  <!-- <ul>
-    <li>
-      <NuxtLink to="" @click="shouldShowFlyout = true">+</NuxtLink>
-    </li> -->
-    <!-- <li v-for="story in store.stories">
-      <NuxtLink :to="`/sessions/stories/${story.id}`" prefetch>
-        {{ story.title }}
-      </NuxtLink>
-      <small>{{  parseDate(story.created_at) }}</small>
-    </li> -->
-  <!-- </ul> -->
   <JoinSession
     v-model:sessionUsername="store.sessionUsername"
     v-model:session-observer="store.sessionObserver"

@@ -11,7 +11,7 @@ export const useGetSessionUsers = async (supabase) => {
   store.activeSession.users = users;
   store.activeSession.users.forEach((user) => user.points = null)
 
-  if (!error) {
-    store.setPokerPoints();
-  }
+  // if (!error) {
+  //   store.setPokerPoints();
+  // }
 }

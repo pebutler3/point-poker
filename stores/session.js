@@ -19,11 +19,12 @@ export const useSession = defineStore('session', () => {
   const setSessionStories = (sessionStories) => stories.value = sessionStories;
   const setWhoami = (user) => whoami.value = user;
   const setPokerPoints = (id, session_id) => {
+    console.log(id, session_id, activeSession.id)
     pokerPoints.value.id = id
-    pokerPoints.value.session_id = activeSession.id
+    pokerPoints.value.session_id = session_id
     pokerPoints.value.username = sessionUsername
-    whoami.value.id = id
-    whoami.value.username = sessionUsername
+    // whoami.value.id = id
+    // whoami.value.username = sessionUsername
   }
 
   const setTemporarySession = (session) => temporarySession.value = session;
