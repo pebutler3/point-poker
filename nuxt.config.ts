@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   devServer: {
-    port: '8888'
+    port: 8888
   },
   modules: ['@nuxtjs/supabase', '@pinia/nuxt'],
   pinia: {
