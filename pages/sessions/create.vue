@@ -4,11 +4,19 @@ const store = useSession();
 
 <template>
   <h1>{{ store.temporarySession.session_name ?? '' }}</h1>
+  <!-- 
+    TODO:
+    I think this page is redundant
+    This can just be achieved on the Session Page
+
+    Instead of checking whoami for whether or not
+    We show JoinSession we can check if our userId (whoami.id)
+    is in the activeSession.users list
+   -->
   <JoinSession
     v-model:sessionUsername="store.sessionUsername"
     v-model:session-observer="store.sessionObserver"
     @join-session="useJoinSession"
-    v-if="!store.whoami"
   />
 </template>
 

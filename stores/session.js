@@ -7,36 +7,23 @@ export const useSession = defineStore('session', () => {
   const sessionUsername = ref(null);
   const sessionObserver = ref(false);
   const temporarySession = ref(null);
-  const whoami = ref(null)
+  const whoami = ref({});
+  const pokerPoints = useStorage('pokerPoints', {});
+
+  if (pokerPoints.value && pokerPoints.value.username) {
+    whoami.value.username = pokerPoints.value.username;
+    whoami.value.id = pokerPoints.value.id
+  }
 
   const setActiveSession = (session) => activeSession.value = session;
   const setSessionStories = (sessionStories) => stories.value = sessionStories;
-  const setWhoami = (user) => {
-    whoami.value = user;
-  }
-
-  const setPokerPoints = (id, session_id, username) => {
-    // const { id, session_id, username, } = [ ...props ];
-
-    console.log('SET_POKER_POINTS', {
-      id,
-      session_id,
-      username
-    })
-
-    const storedPokerPoints = useStorage('pokerPoints');
-
-    if (storedPokerPoints.value === "{}" || !storedPokerPoints.value) {
-      useStorage('pokerPoints', {
-        id,
-        session_id,
-        username
-      })
-
-      whoami.value = id
-    } else {
-      setWhoami(JSON.parse(storedPokerPoints.value).id)
-    }
+  const setWhoami = (user) => whoami.value = user;
+  const setPokerPoints = (id, session_id) => {
+    pokerPoints.value.id = id
+    pokerPoints.value.session_id = activeSession.id
+    pokerPoints.value.username = sessionUsername
+    whoami.value.id = id
+    whoami.value.username = sessionUsername
   }
 
   const setTemporarySession = (session) => temporarySession.value = session;

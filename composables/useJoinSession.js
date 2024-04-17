@@ -6,6 +6,10 @@ export const useJoinSession = async () => {
   const { id, session_id, username } = await useCreateUser();
 
   store.setPokerPoints(id, session_id, username);
-  await useCreateSession();
+
+  if (store.activeSession.users.length < 1) {
+    await useCreateSession();
+  }
+
   router.push(`/sessions/${session_id}`);
 }
