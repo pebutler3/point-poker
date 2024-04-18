@@ -3,7 +3,7 @@ import { useStorage } from "@vueuse/core";
 export const useSession = defineStore('session', () => {
   const stories = ref([]);
   const activeSession = ref({});
-  const pointOptions = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100];
+  const pointOptions = ["0", "0.5", "1", "2", "3", "5", "8", "13", "20", "40", "100", "🤷‍♂️"];
   const sessionUsername = ref(null);
   const sessionObserver = ref(false);
   const temporarySession = ref(null);
@@ -27,10 +27,16 @@ export const useSession = defineStore('session', () => {
     // whoami.value.username = sessionUsername
   }
 
+  const isUserInSession = computed(() => {
+    const userIds = activeSession?.value?.users?.map((user) => user.id);
+    return userIds?.includes(whoami.value.id)
+  })
+
   const setTemporarySession = (session) => temporarySession.value = session;
 
   return {
     activeSession,
+    isUserInSession,
     pointOptions,
     sessionUsername,
     sessionObserver,

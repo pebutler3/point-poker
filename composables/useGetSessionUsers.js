@@ -9,7 +9,7 @@ export const useGetSessionUsers = async (supabase) => {
     .eq('session_id', store.activeSession.id)
 
   store.activeSession.users = users;
-  store.activeSession.users.forEach((user) => user.points = null)
+  store.activeSession.users.forEach((user) => user.points = null);
 
   // if (!error) {
   //   store.setPokerPoints();

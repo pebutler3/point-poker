@@ -1,10 +1,8 @@
 <script setup>
 import { useSession } from '../../stores/session';
 const store = useSession();
-// if (process.client) {
 const supabase = useSupabaseClient();
-  // const sessionUsername = ref(null);
-  // const sessionObserver = ref(false);
+const sessionPoints = ref(null);
   
 const { data } = await supabase.from('sessions')
   .select()
@@ -14,7 +12,15 @@ const { data } = await supabase.from('sessions')
 store?.setActiveSession(...data)
 
 useGetSessionUsers(supabase, await store?.activeSession?.session_id);
-// }
+sessionPoints.value = await useSessionPoints(useRouter().currentRoute.value.params.id[0]);
+
+
+// const { data: story_points, error } = await supabase
+//   .from('story_points')
+//   .select("*")
+//   .eq('session_id', useRouter().currentRoute.value.params.id[0])
+
+//   console.log(story_points)
 </script>
 
 <template>
@@ -23,12 +29,18 @@ useGetSessionUsers(supabase, await store?.activeSession?.session_id);
     v-model:sessionUsername="store.sessionUsername"
     v-model:session-observer="store.sessionObserver"
     @join-session="useJoinSession"
-    v-if="!store.whoami"
+    v-if="!store.isUserInSession"
   />
+  <div class="points__wrapper" v-else>
+    <button v-for="points in store.pointOptions">
+      {{ points }}
+    </button>
+  </div>
   <ul>
-    <li v-for="{ id, username } in store.activeSession?.users">
-      {{ username }}
-      <span v-if="id === store.whoami.id">*</span>
+    <li v-for="(user, i) in store.activeSession?.users">
+      {{ user.username }} 
+      <template v-if="sessionPoints.length > 0">{{ JSON.parse(sessionPoints[i]?.points) }}</template>
+      <span v-if="user.id === store.whoami.id">*</span>
     </li>
   </ul>
 </template>
@@ -106,5 +118,10 @@ small {
   position: absolute;
   top: -15px;
   right: 5px;
+}
+
+.points__wrapper {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
 }
 </style>
