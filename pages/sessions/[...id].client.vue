@@ -1,26 +1,70 @@
 <script setup>
+import { toRaw } from 'vue';
 import { useSession } from '../../stores/session';
 const store = useSession();
 const supabase = useSupabaseClient();
 const sessionPoints = ref(null);
-  
+const userHasVoted = ref(false);
+
+const pointsSelected = async (points) => {
+  if (!userHasVoted.value) {
+    await supabase
+      .from('story_points')
+      .insert([
+        { points: JSON.stringify(points), user_id: store.whoami?.id, session_id: store.activeSession?.id },
+      ])
+      .select('*')
+
+      userHasVoted.value = true;
+  } else {
+  await supabase
+    .from('story_points')
+    .update({ points: JSON.stringify(points) })
+    .eq('session_id', store.activeSession?.id)
+    .eq('user_id', store.whoami?.id)
+    .select()
+  }
+};
+
 const { data } = await supabase.from('sessions')
   .select()
   .eq('id', useRouter()
-  .currentRoute.value.params.id[0])
+  .currentRoute.value.params.id[0]);
 
-store?.setActiveSession(...data)
+store?.setActiveSession(...data);
 
 useGetSessionUsers(supabase, await store?.activeSession?.session_id);
 sessionPoints.value = await useSessionPoints(useRouter().currentRoute.value.params.id[0]);
 
+onMounted(() => {
+  const activeUser = sessionPoints.value.filter((u) => u.user_id === store.whoami.id);
 
-// const { data: story_points, error } = await supabase
-//   .from('story_points')
-//   .select("*")
-//   .eq('session_id', useRouter().currentRoute.value.params.id[0])
+  if (activeUser[0]?.points) {
+    userHasVoted.value = true;
+  }
 
-//   console.log(story_points)
+  supabase.channel(`story-points-update-${store.activeSession.id}`)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'story_points' },
+      (payload) => {
+        const updatedUser = sessionPoints.value.find((u) => u.user_id === payload['new'].user_id);
+        // sessionPoints.value = [
+        //   ...sessionPoints.value.filter((u) => u.user_id !== payload.new.user_id),
+        //   payload.new
+        // ]
+        // updatedUser.points = payload.new.points;
+        console.log('Change received!', payload['new'].user_id)
+      }
+    )
+    .subscribe()
+    sessionPoints.value.forEach(sessionPoint => {
+    const user = store.activeSession.users.find(user => user.id === sessionPoint.user_id);
+    if (user) {
+        user.points = sessionPoint.points;
+    }
+    });
+})
 </script>
 
 <template>
@@ -32,15 +76,15 @@ sessionPoints.value = await useSessionPoints(useRouter().currentRoute.value.para
     v-if="!store.isUserInSession"
   />
   <div class="points__wrapper" v-else>
-    <button v-for="points in store.pointOptions">
+    <button v-for="points in store.pointOptions" @click="pointsSelected(points)">
       {{ points }}
     </button>
   </div>
   <ul>
     <li v-for="(user, i) in store.activeSession?.users">
-      {{ user.username }} 
-      <template v-if="sessionPoints.length > 0">{{ JSON.parse(sessionPoints[i]?.points) }}</template>
-      <span v-if="user.id === store.whoami.id">*</span>
+      {{ user.username }} - {{ user.points }}
+      <!-- <template v-if="sessionPoints?.length > 0">{{ sessionPoints[i]?.points }}</template> -->
+      <span v-if="user?.id === store.whoami?.id">*</span>
     </li>
   </ul>
 </template>
