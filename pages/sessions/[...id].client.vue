@@ -48,21 +48,16 @@ onMounted(() => {
       'postgres_changes',
       { event: '*', schema: 'public', table: 'story_points' },
       (payload) => {
-        const updatedUser = sessionPoints.value.find((u) => u.user_id === payload['new'].user_id);
-        // sessionPoints.value = [
-        //   ...sessionPoints.value.filter((u) => u.user_id !== payload.new.user_id),
-        //   payload.new
-        // ]
-        // updatedUser.points = payload.new.points;
-        console.log('Change received!', payload['new'].user_id)
+        const updatedUser = store.activeSession.users.find((user) => user.id === payload['new'].user_id)
+        updatedUser.points = payload['new'].points;
       }
     )
     .subscribe()
     sessionPoints.value.forEach(sessionPoint => {
-    const user = store.activeSession.users.find(user => user.id === sessionPoint.user_id);
-    if (user) {
+      const user = store.activeSession.users.find((user) => user.id === sessionPoint.user_id);
+      if (user) {
         user.points = sessionPoint.points;
-    }
+      }
     });
 })
 </script>
@@ -81,9 +76,8 @@ onMounted(() => {
     </button>
   </div>
   <ul>
-    <li v-for="(user, i) in store.activeSession?.users">
-      {{ user.username }} - {{ user.points }}
-      <!-- <template v-if="sessionPoints?.length > 0">{{ sessionPoints[i]?.points }}</template> -->
+    <li v-for="(user) in store.activeSession?.users">
+      {{ user.username }} - {{ JSON.parse(user.points) }}
       <span v-if="user?.id === store.whoami?.id">*</span>
     </li>
   </ul>
