@@ -5,6 +5,9 @@ const store = useSession();
 const supabase = useSupabaseClient();
 const sessionPoints = ref(null);
 const userHasVoted = ref(false);
+const showPoints = ref(false);
+
+const togglePoints = () => showPoints.value = !showPoints.value;
 
 const pointsSelected = async (points) => {
   if (!userHasVoted.value) {
@@ -25,6 +28,16 @@ const pointsSelected = async (points) => {
     .select()
   }
 };
+
+const clearPoints = async () => {
+  const { data, error } = await supabase
+    .rpc('clear_points_by_session', {
+      session_id_arg: store.activeSession.id
+    })
+  if (error) console.error(error)
+
+  showPoints.value = false;
+}
 
 const { data } = await supabase.from('sessions')
   .select()
@@ -54,7 +67,7 @@ onMounted(() => {
     )
     .subscribe()
     sessionPoints.value.forEach(sessionPoint => {
-      const user = store.activeSession.users.find((user) => user.id === sessionPoint.user_id);
+      const user = store.activeSession?.users.find((user) => user.id === sessionPoint.user_id);
       if (user) {
         user.points = sessionPoint.points;
       }
@@ -70,15 +83,23 @@ onMounted(() => {
     @join-session="useJoinSession"
     v-if="!store.isUserInSession"
   />
-  <div class="points__wrapper" v-else>
-    <button v-for="points in store.pointOptions" @click="pointsSelected(points)">
-      {{ points }}
-    </button>
+  <div class="points" v-else>
+    <div class="points__wrapper">
+      <button class="btn btn--secondary" v-for="points in store.pointOptions" @click="pointsSelected(points)">
+        {{ points }}
+      </button>
+    </div>
+    <div class="points__actions">
+      <button class="btn btn--primary" @click="togglePoints">Show Votes</button>
+      <button class="btn btn--tertiary" @click="clearPoints">Clear Votes</button>
+    </div>
   </div>
   <ul>
     <li v-for="(user) in store.activeSession?.users">
-      {{ user.username }} - {{ JSON.parse(user.points) }}
-      <span v-if="user?.id === store.whoami?.id">*</span>
+      {{ user.username }} <span v-if="showPoints">- {{ JSON.parse(user.points) }}</span>
+      <span v-if="user?.id === store.whoami?.id">
+        *
+      </span>
     </li>
   </ul>
 </template>
@@ -160,6 +181,15 @@ small {
 
 .points__wrapper {
   display: grid;
+  grid-gap: 0.5rem;
   grid-template-columns: repeat(12, 1fr);
 }
+
+.points__actions {
+  display: grid;
+  grid-gap: 0.5rem;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 0.5rem;
+}
+
 </style>

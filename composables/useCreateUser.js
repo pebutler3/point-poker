@@ -9,7 +9,7 @@ export const useCreateUser = async () => {
     .from('users')
     .insert({
         username: store.sessionUsername,
-        session_id: store.temporarySession.id,
+        session_id: store.activeSession.id || store.temporarySession.id,
         observer: store.sessionObserver,
       })
     .select();

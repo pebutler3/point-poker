@@ -10,6 +10,7 @@
   --light-blue: #00cfff69;
   --dark-blue: #0c0835;
   --border-blue: #00cfff;
+  --off-white: #f2f2f2;
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
   --mx-1: 0 1rem;
@@ -56,20 +57,45 @@ input {
   padding: 0.5rem;
 }
 
-button {
+.btn {
   padding: 1rem;
-  background-color: var(--light-blue);
-  border: 1px solid var(--border-blue);
   font-weight: bold;
   color: var(--dark-blue);
+  border: 1px solid;
   border-radius: 5px;
   transition: all 250ms linear;
 }
 
-button:hover {
+/* .btn:hover {
   background-color: var(--dark-blue);
   border-color: var(--dark-blue);
   color: white;
+} */
+
+.btn--primary {
+  background-color: var(--dark-blue);
+  border-color: var(--dark-blue);
+  color: white;
+}
+
+.btn--secondary {
+  background-color: var(--light-blue);
+  border-color: var(--border-blue);
+}
+
+.btn--secondary:hover {
+  background-color: var(--dark-blue);
+  border-color: var(--dark-blue);
+  color: white;
+}
+
+.btn--tertiary {
+  background-color: white;
+  border-color: var(--dark-blue)
+}
+
+.btn--tertiary:hover {
+  background-color: var(--off-white);
 }
 
 button.with-margin {

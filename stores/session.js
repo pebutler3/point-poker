@@ -23,8 +23,6 @@ export const useSession = defineStore('session', () => {
     pokerPoints.value.id = id
     pokerPoints.value.session_id = session_id
     pokerPoints.value.username = sessionUsername
-    // whoami.value.id = id
-    // whoami.value.username = sessionUsername
   }
 
   const isUserInSession = computed(() => {
