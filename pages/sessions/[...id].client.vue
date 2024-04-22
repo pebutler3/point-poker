@@ -32,7 +32,7 @@ const pointsSelected = async (points) => {
 const clearPoints = async () => {
   const { data, error } = await supabase
     .rpc('clear_points_by_session', {
-      session_id_arg: store.activeSession.id
+      session_id_arg: store.activeSession?.id
     })
   if (error) console.error(error)
 
@@ -50,24 +50,24 @@ useGetSessionUsers(supabase, await store?.activeSession?.session_id);
 sessionPoints.value = await useSessionPoints(useRouter().currentRoute.value.params.id[0]);
 
 onMounted(() => {
-  const activeUser = sessionPoints.value.filter((u) => u.user_id === store.whoami.id);
+  const activeUser = sessionPoints.value.filter((u) => u.user_id === store.whoami?.id);
 
   if (activeUser[0]?.points) {
     userHasVoted.value = true;
   }
 
-  supabase.channel(`story-points-update-${store.activeSession.id}`)
+  supabase.channel(`story-points-update-${store.activeSession?.id}`)
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'story_points' },
       (payload) => {
-        const updatedUser = store.activeSession.users.find((user) => user.id === payload['new'].user_id)
+        const updatedUser = store.activeSession?.users?.find((user) => user.id === payload['new'].user_id)
         updatedUser.points = payload['new'].points;
       }
     )
     .subscribe()
     sessionPoints.value.forEach(sessionPoint => {
-      const user = store.activeSession?.users.find((user) => user.id === sessionPoint.user_id);
+      const user = store.activeSession?.users?.find((user) => user.id === sessionPoint.user_id);
       if (user) {
         user.points = sessionPoint.points;
       }
