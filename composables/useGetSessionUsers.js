@@ -8,6 +8,8 @@ export const useGetSessionUsers = async (supabase) => {
     .select()
     .eq('session_id', store.activeSession?.id)
 
-  store.activeSession?.users = users;
-  store.activeSession?.users?.forEach((user) => user.points = null);
+  if (store.activeSession.users) {
+    store.activeSession.users = users;
+    store.activeSession?.users?.forEach((user) => user.points = null);
+  }
 }
