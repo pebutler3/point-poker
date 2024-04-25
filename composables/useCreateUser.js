@@ -1,7 +1,6 @@
 import { useSession } from '../stores/session';
 
 export const useCreateUser = async () => {
-  const router = useRouter();
   const supabase = useSupabaseClient();
   const store = useSession();
 
