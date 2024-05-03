@@ -1,12 +1,17 @@
 import { useSession } from '../stores/session';
 
-const supabase = useSupabaseClient();
-const store = useSession();
-const router = useRouter();
-
 export const useCreateUser = async () => {
-  const { id, session_id, username } = await createUser();
-  store.setPokerPoints(id, session_id, username);
-  await createSession();
-  router.push(`/sessions/${session_id}`);
+  const supabase = useSupabaseClient();
+  const store = useSession();
+
+  const { data, error } = await supabase
+    .from('users')
+    .insert({
+        username: store.sessionUsername,
+        session_id: store.temporarySession.id,
+        observer: store.sessionObserver,
+      })
+    .select();
+
+    return data[0];
 }

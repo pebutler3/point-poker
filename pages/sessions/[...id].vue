@@ -1,5 +1,4 @@
 <script setup>
-import { onBeforeMount } from 'vue';
 import { useSession } from '../../stores/session';
 
 const store = useSession();
@@ -10,11 +9,6 @@ const sessionObserver = ref(false);
 definePageMeta({
   middleware: ['session-stories']
 });
-// const router = useRouter();
-// const sessionUsername = ref(null);
-// const isInSession = ref(false);
-// const sessionStorage = ref({});
-// const shouldShowFlyout = ref(false);
 
 const { data } = await supabase.from('sessions')
   .select()
@@ -24,40 +18,6 @@ const { data } = await supabase.from('sessions')
 store.setActiveSession(...data)
 
 useGetSessionUsers(supabase, await store.activeSession.session_id);
-
-// const joinSession = async () => {
-
-//   const { data, error } = await supabase
-//     .from('users')
-//     .insert({
-//         username: sessionUsername.value,
-//         session_id: store.activeSession.id
-//       })
-//     .select()
-          
-//   const { id, session_id, username } = data[0];
-
-//   if (!error) {
-//     store.setPokerPoints({ id, session_id, username });
-//     isInSession.value = true;
-//   }
-// }
-
-// const createStory = async () => {
-//   const { error, data } = await supabase
-//     .from('stories')
-//     .insert({ title: storyTitle.value, session_id: store.activeSession.id })
-//     .select()
-
-//     router.push(`/sessions/stories/${data[0].id}`)
-// }
-
-onBeforeMount(() => {
-  // if (JSON.parse(localStorage.getItem('pokerPoints'))) {
-  //   isInSession.value = true;
-  //   store.setPokerPoints();
-  // }
-})
 </script>
 
 <template>
@@ -86,7 +46,7 @@ onBeforeMount(() => {
     <JoinSession
       v-model:sessionUsername="sessionUsername"
       v-model:session-observer="sessionObserver"
-      @join-session="joinSession"
+      @join-session="useJoinSession"
       v-if="!store.whoami"
     />
     <ul>

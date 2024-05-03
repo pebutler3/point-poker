@@ -1,10 +1,7 @@
 <script setup>
-import { v4 as uuidv4 } from 'uuid';
-import generateRandomTitle from '~/utils/generateRandomTitle';
-
+import { onMounted } from 'vue';
 const supabase = useSupabaseClient();
 const router = useRouter();
-const sessionStore = useSession();
 const sessionsStore = useSessions();
 
 async function getSessions() {
@@ -12,28 +9,10 @@ async function getSessions() {
   sessionsStore.setSessions(data);
 }
 
-onMounted(async () => {
-  await getSessions();
-})
-
 const createTemporarySession = () => {
-  sessionStore.setTemporarySession({
-    id: uuidv4(),
-    session_name: generateRandomTitle(),
-  })
+  useCreateTemporarySession();
   router.push('/sessions/create');
 }
-
-// const createSession = async (title) => {
-//   const { error, data } = await supabase
-//     .from('sessions')
-//     .insert({ session_name: generateRandomTitle() })
-//     .select()
-
-//   sessionStore.setActiveSession(data[0]);
-//   // router.push(`/sessions/${data[0].id}`);
-//   router.push('/sessions/create');
-// };
 
 const removeSession = async (sessionId) => {
   const { error } = await supabase
@@ -43,10 +22,15 @@ const removeSession = async (sessionId) => {
     
     getSessions();
 }
+
+onMounted(async () => {
+  useCreateTemporarySession();
+  await getSessions();
+})
 </script>
 
 <template>
-  <div>
+  <div class="index__wrapper">
     <CreateSession @create-session="createTemporarySession" />
     <h1>Sessions</h1>
     <!-- Session List for Admins -->
@@ -67,6 +51,10 @@ body,
 #__nuxt,
 main {
   height: 100%;
+}
+
+.index__wrapper {
+  min-width: 80%;
 }
 
 .session-list {

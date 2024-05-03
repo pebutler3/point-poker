@@ -4,6 +4,8 @@ export const useSession = defineStore('session', () => {
   const stories = ref([]);
   const activeSession = ref({});
   const pointOptions = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100];
+  const sessionUsername = ref(null);
+  const sessionObserver = ref(false);
   const temporarySession = ref(null);
   const whoami = ref(null)
 
@@ -37,18 +39,13 @@ export const useSession = defineStore('session', () => {
     }
   }
 
-  const joinSession = async () => {
-    const { id, session_id, username } = await createUser();
-    store.setPokerPoints(id, session_id, username);
-    await createSession();
-    router.push(`/sessions/${session_id}`);
-  }
-
   const setTemporarySession = (session) => temporarySession.value = session;
 
   return {
     activeSession,
     pointOptions,
+    sessionUsername,
+    sessionObserver,
     setActiveSession,
     setPokerPoints,
     setSessionStories,

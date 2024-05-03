@@ -1,49 +1,13 @@
 <script setup>
-const router = useRouter();
-const supabase = useSupabaseClient();
 const store = useSession();
-const sessionUsername = ref(null);
-const sessionObserver = ref(false);
-
-const createUser = async () => {
-  const { data, error } = await supabase
-    .from('users')
-    .insert({
-        username: sessionUsername.value,
-        session_id: store.temporarySession.id,
-        observer: sessionObserver.value,
-      })
-    .select();
-
-    return data[0];
-}
-
-const createSession = async () => {
-  const { data, error } = await supabase
-    .from('sessions')
-    .insert({
-      id: store.temporarySession.id,
-      session_name: store.temporarySession.session_name
-    })
-}
-
-const joinSession = async () => {
-  const { id, session_id, username } = await createUser();
-
-  store.setPokerPoints(id, session_id, username);
-
-  await createSession();
-
-  router.push(`/sessions/${session_id}`);
-}
 </script>
 
 <template>
   <h1>{{ store.temporarySession.session_name ?? '' }}</h1>
   <JoinSession
-    v-model:sessionUsername="sessionUsername"
-    v-model:session-observer="sessionObserver"
-    @join-session="joinSession"
+    v-model:sessionUsername="store.sessionUsername"
+    v-model:session-observer="store.sessionObserver"
+    @join-session="useJoinSession"
     v-if="!store.whoami"
   />
 </template>
